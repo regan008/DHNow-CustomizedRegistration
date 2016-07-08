@@ -32,9 +32,9 @@
 		</p>
 		<p class="form-row">
 			<legend>Sign Up Dates</legend>
-	    <input id="checkbox1" type="checkbox" value="1"><label for="checkbox1">Checkbox 1</label>
-	    <input id="checkbox2" type="checkbox"><label for="checkbox2">Checkbox 2</label>
-	    <input id="checkbox3" type="checkbox"><label for="checkbox3">Checkbox 3</label>
+	    <input name="volunteer_dates[]" type="checkbox" value="26"><label for="checkbox1">26</label>
+	    <input name="volunteer_dates[]" type="checkbox" value="27"><label for="checkbox2">27</label>
+	    <input name="volunteer_dates[]" type="checkbox" value="28"><label for="checkbox3">28</label>
 		</p>
 		<p class="form-row">
     	<legend>Choose Your Favorite</legend>

@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name:       Personalize Login
+ * Plugin Name:       DHNow User Registration
  * Description:       A plugin that replaces the WordPress login flow with a custom page.
  * Version:           1.0.0
- * Author:            Jarkko Laine
+ * Author:            Amanda Regan
  * License:           GPL-2.0+
  * Text Domain:       personalize-login
  */
@@ -472,6 +472,7 @@ class Personalize_Login_Plugin {
 				$email = $_POST['email'];
 				$first_name = sanitize_text_field( $_POST['first_name'] );
 				$last_name = sanitize_text_field( $_POST['last_name'] );
+				$volunteer_dates = $_POST['dhnow_2016_volunteers[]'];
 
 				$result = $this->register_user( $email, $first_name, $last_name );
 
@@ -640,9 +641,13 @@ class Personalize_Login_Plugin {
 			'nickname'      => $first_name,
 		);
 
+
+
+
 		$user_id = wp_insert_user( $user_data );
 		wp_new_user_notification( $user_id, $password );
 
+		add_user_meta( $user_id, 'dhnow_2016_volunteers[]', $volunteer_dates);
 		return $user_id;
 	}
 
@@ -816,3 +821,89 @@ $personalize_login_pages_plugin = new Personalize_Login_Plugin();
 
 // Create the custom pages at plugin activation
 register_activation_hook( __FILE__, array( 'Personalize_Login_Plugin', 'plugin_activated' ) );
+
+/**
+ * Include and setup custom metaboxes and fields. (make sure you copy this file to outside the CMB2 directory)
+ *
+ * Be sure to replace all instances of 'yourprefix_' with your project's prefix.
+ * http://nacin.com/2010/05/11/in-wordpress-prefix-everything/
+ *
+ * @category YourThemeOrPlugin
+ * @package  Demo_CMB2
+ * @license  http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
+ * @link     https://github.com/WebDevStudios/CMB2
+ */
+ add_action( 'cmb2_admin_init', 'yourprefix_register_user_profile_metabox' );
+ /**
+  * Hook in and add a metabox to add fields to the user profile pages
+  */
+ function yourprefix_register_user_profile_metabox() {
+ 	$prefix = 'dhnow_';
+ 	/**
+ 	 * Metabox for the user profile screen
+ 	 */
+ 	$cmb_user = new_cmb2_box( array(
+ 		'id'               => $prefix . 'edit',
+ 		'title'            => __( 'Editor-At-Large Info', 'cmb2' ), // Doesn't output for user boxes
+ 		'object_types'     => array( 'user' ), // Tells CMB2 to use user_meta vs post_meta
+ 		'show_names'       => true,
+ 		'new_user_section' => 'add-new-user', // where form will show on new user page. 'add-existing-user' is only other valid option.
+ 	) );
+	$cmb_user->add_field( array(
+	'name'     => __( 'Editor-at-Large Info', 'cmb2' ),
+	'desc'     => __( 'field description (optional)', 'cmb2' ),
+	'id'       => $prefix . 'extra_info',
+	'type'     => 'title',
+	'on_front' => false,
+) );
+	$cmb_user->add_field( array(
+		'name'    => __( 'Test Multi Checkbox', 'cmb2' ),
+		'desc'    => __( 'field description (optional)', 'cmb2' ),
+		'id'      => $prefix . '2016_volunteers',
+		'type'    => 'multicheck',
+		'options' => array(
+			'26' => __( '26', 'cmb2' ),
+			'27' => __( '27', 'cmb2' ),
+			'28' => __( '28', 'cmb2' ),
+		),
+		// 'inline'  => true, // Toggles display to inline
+	) );
+	$cmb_user->add_field( array(
+		'name'             => __( 'Opt Out', 'cmb2' ),
+		'desc'             => __( 'Would you like your profile information (name, institution, and bio) to be publicly viewable on Editor\'s Choice posts?', 'cmb2' ),
+		'id'               => $prefix . 'opt_out',
+		'type'             => 'radio_inline',
+		'options'          => array(
+			'true' => __( 'Yes', 'cmb2' ),
+			'false'   => __( 'No', 'cmb2' ),
+		),
+	) );
+
+	$cmb_user->add_field( array(
+		'name'       => __( 'Location', 'cmb2' ),
+		'desc'       => __( 'field description (optional)', 'cmb2' ),
+		'id'         => $prefix . 'location',
+		'type'       => 'text',
+		'show_on_cb' => 'yourprefix_hide_if_no_cats', // function should return a bool value
+	) );
+	$cmb_user->add_field( array(
+		'name'       => __( 'Institutional Affiliation', 'cmb2' ),
+		'desc'       => __( 'field description (optional)', 'cmb2' ),
+		'id'         => $prefix . 'institutional_affil',
+		'type'       => 'text',
+		'show_on_cb' => 'yourprefix_hide_if_no_cats', // function should return a bool value
+	) );
+	$cmb_user->add_field( array(
+		'name'       => __( 'Twitter Handle', 'cmb2' ),
+		'desc'       => __( 'field description (optional)', 'cmb2' ),
+		'id'         => $prefix . 'twitter_handle',
+		'type'       => 'text',
+		'show_on_cb' => 'yourprefix_hide_if_no_cats', // function should return a bool value
+	) );
+	// $cmb_user->add_field( array(
+	// 		'name' => __( 'About Yourself', 'cmb2' ),
+	// 		'desc' => __( 'field description (optional)', 'cmb2' ),
+	// 		'id'   => $prefix . 'textarea',
+	// 		'type' => 'textarea',
+	// 	) );
+}
